@@ -2,28 +2,28 @@ from SPARQLWrapper import SPARQLWrapper, JSON
 
 sparql = SPARQLWrapper("http://factforge.net/repositories/ff-news")
 query = """
-# F02: Big Cities in Eastern Europe
+# GraphDB’s geo-spatial plug-in allows efficient evaluation of near-by
+# RDFRank ranks entities based on their popularity(links to other entities)
 
-PREFIX onto: <http://www.ontotext.com/>
-PREFIX gn: <http://www.geonames.org/ontology#>
-PREFIX dbo: <http://dbpedia.org/ontology/>
 PREFIX dbr: <http://dbpedia.org/resource/>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX geo-pos: <http://www.w3.org/2003/01/geo/wgs84_pos#>
+PREFIX gdb-geo: <http://www.ontotext.com/owlim/geo#>
+PREFIX dbo: <http://dbpedia.org/ontology/>
+PREFIX rank: <http://www.ontotext.com/owlim/RDFRank#>
+PREFIX gn: <http://www.geonames.org/ontology#>
 
-SELECT * FROM onto:disable-sameAs
+SELECT DISTINCT ?object ?featureCode ?rrank ?london_lat ?lond_nlong ?lat ?long ?dist
 WHERE {
-    SERVICE <http://factforge.net/repositories/ff-news>{
-    ?loc gn:parentFeature dbr:Eastern_Europe ; 
-         gn:featureClass  gn:P;
-         gn:featureCode gn:A.ADM2.
-    ?loc dbo:populationTotal ?population ; dbo:country ?country .
-    ?country a dbo:Country .
-    }
-    FILTER(?population > 300000 )
-    ?country skos:prefLabel ?country_name . 
-
-} ORDER BY ?country_name DESC(?population)
+   { SELECT * { dbr:London geo-pos:lat ?london_lat ; geo-pos:long ?lond_nlong . } LIMIT 1 }
+   ?object gdb-geo:nearby(?london_lat ?lond_nlong "15mi");
+       gn:featureCode ?featureCode;
+       rank:hasRDFRank3 ?rrank;
+		geo-pos:lat ?lat;
+		geo-pos:lat ?long .
+    BIND (gdb-geo:distance(?lat, ?long, ?london_lat, ?lond_nlong) AS ?dist)
+    FILTER(?featureCode IN (gn:S.BANK, gn:S.CSTL))
+} 
+ORDER BY DESC(?rrank)
 
 """
 sparql.setQuery(query)
