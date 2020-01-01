@@ -10,9 +10,11 @@ g.lat
 g.lng
 
 
-def get_cities_with_temperature():
-    """# Populated places with specified temperature
-    
+def get_cities_with_temperature(latitude, longitude):
+    sparql = SPARQLWrapper("http://factforge.net/repositories/ff-news")
+    field = "yearMeanC"
+    predicate = "> 10"
+    query = f"""# Populated places with specified temperature
     PREFIX dbr: <http://dbpedia.org/resource/>
     PREFIX geo-pos: <http://www.w3.org/2003/01/geo/wgs84_pos#>
     PREFIX gdb-geo: <http://www.ontotext.com/owlim/geo#>
@@ -21,19 +23,25 @@ def get_cities_with_temperature():
     PREFIX gn: <http://www.geonames.org/ontology#>
     PREFIX dbp: <http://dbpedia.org/property/>
 
-    SELECT DISTINCT ?object ?featureCode ?rrank ?yearHighC
-    WHERE {
-    { SELECT * { dbr:London geo-pos:lat ?london_lat ; geo-pos:long ?lond_nlong . } LIMIT 1 }
-    ?object gdb-geo:nearby(?london_lat ?lond_nlong "25mi");
+    SELECT DISTINCT ?object ?lat ?long
+    WHERE {{
+    ?object gdb-geo:nearby({latitude} {longitude} "150km");
         gn:featureCode ?featureCode;
         gn:featureClass  gn:P;
         rank:hasRDFRank3 ?rrank;
             geo-pos:lat ?lat;
             geo-pos:lat ?long;
-            dbp:yearHighC ?yearHighC .
-    } 
+            dbp:{field} ?{field} .
+        FILTER(?{field} {predicate} 
+            && datatype(?lat) = xsd:float && datatype(?long) = xsd:float)
+    }}
     ORDER BY DESC(?rrank)
     """
+
+    sparql.setQuery(query)
+    sparql.setReturnFormat(JSON)
+    results = sparql.query().convert()
+    return results
 
 
 def get_geofeatures(latitude, longitude):
@@ -51,12 +59,11 @@ def get_geofeatures(latitude, longitude):
     ?object gdb-geo:nearby({latitude} {longitude} "550km");
         gn:featureCode ?featureCode;
         rank:hasRDFRank3 ?rrank;
-            geo-pos:lat ?lat_r;
-            geo-pos:lat ?long_r . 
-        BIND (xsd:float(?lat_r) as ?lat)
-        BIND (xsd:float(?long_r) as ?long)
+            geo-pos:lat ?lat;
+            geo-pos:lat ?long .
+        FILTER(?featureCode IN ({", ".join(geo_features)}) 
+            && datatype(?lat) = xsd:float && datatype(?long) = xsd:float)
         BIND (gdb-geo:distance(?lat, ?long, {latitude}, {longitude}) AS ?dist)
-        FILTER(?featureCode IN ({", ".join(geo_features)}))
     }}
     ORDER BY DESC(?rrank)
     """
@@ -87,14 +94,16 @@ def get_activities(latitude, longitude):
             BIND (bif:st_distance(bif:st_point({latitude}, {longitude}), ?fWKT ) AS ?distance_km) .
             FILTER (?distance_km < 4700 && ?fCategory_Val IN ({", ".join(actitivies_quoted)}))
         }}
-    ORDER BY ?distance_km		
-                
+    ORDER BY ?distance_km		              
     """
     sparql.setQuery(query)
     sparql.setReturnFormat(JSON)
     results = sparql.query().convert()
     return results
 
+
+temp_results = get_cities_with_temperature(g.lat, g.lng)
+temp_count = len(temp_results["results"]["bindings"])
 
 geo_results = get_geofeatures(g.lat, g.lng)
 geofeatures_count = len(geo_results["results"]["bindings"])
