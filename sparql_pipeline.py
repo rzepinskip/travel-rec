@@ -22,15 +22,15 @@ def get_cities_with_temperature(latitude, longitude):
     PREFIX rank: <http://www.ontotext.com/owlim/RDFRank#>
     PREFIX gn: <http://www.geonames.org/ontology#>
     PREFIX dbp: <http://dbpedia.org/property/>
+    PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
     SELECT DISTINCT ?object ?lat ?long
     WHERE {{
     ?object gdb-geo:nearby({latitude} {longitude} "150km");
-        gn:featureCode ?featureCode;
         gn:featureClass  gn:P;
         rank:hasRDFRank3 ?rrank;
             geo-pos:lat ?lat;
-            geo-pos:lat ?long;
+            geo-pos:long ?long;
             dbp:{field} ?{field} .
         FILTER(?{field} {predicate} 
             && datatype(?lat) = xsd:float && datatype(?long) = xsd:float)
@@ -60,7 +60,7 @@ def get_geofeatures(latitude, longitude):
         gn:featureCode ?featureCode;
         rank:hasRDFRank3 ?rrank;
             geo-pos:lat ?lat;
-            geo-pos:lat ?long .
+            geo-pos:long ?long .
         FILTER(?featureCode IN ({", ".join(geo_features)}) 
             && datatype(?lat) = xsd:float && datatype(?long) = xsd:float)
         BIND (gdb-geo:distance(?lat, ?long, {latitude}, {longitude}) AS ?dist)
