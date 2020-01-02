@@ -3,7 +3,7 @@ from typing import Dict, List
 
 def get_geonames_codes() -> Dict[str, List[str]]:
     return {
-        "mountain": ["U.MTU", "T.MT", "T.MTS"],
+        "mountain": ["T.MT", "T.MTS"],
         "beach": ["T.BCH", "T.BCHS"],
         "plain": ["T.PLN"],
         "lake": ["H.LK", "H.LKS"],
@@ -14,7 +14,7 @@ def get_geonames_codes() -> Dict[str, List[str]]:
     }
 
 
-def get_slipo_codes() -> List[str]:
+def get_slipo_codes() -> Dict[str, str]:
     sports = [
         "ARCHERY",
         "BASEBALL",
@@ -30,15 +30,15 @@ def get_slipo_codes() -> List[str]:
         "HANDBALL",
         "HOCKEY",
         "HORSE",
-        "ICESKATING",
-        "LEISURECENTER",
+        # "ICESKATING",
+        # "LEISURECENTER",
         "MARINA",
-        "MOTORRACING",
+        # "MOTORRACING",
         "PLAYGROUND",
         "RUGBY",
         "SHOOTING",
         "SKATING",
-        "SKIING",
+        # "SKIINGDOWNHILL",
         "SNOOKER",
         "SOCCER",
         "STADIUM",
@@ -46,10 +46,10 @@ def get_slipo_codes() -> List[str]:
         "SWIMMING",
         "TENNIS",
         "VOLLEYBALL",
-        "WATERSKI",
+        # "WATERSKI",
     ]
     tourism = [
-        "ARCHAELOGICAL",
+        # "ARCHAELOGICAL",
         "ART",
         "ATTRACTION",
         "BATTLEFIELD",
@@ -60,7 +60,7 @@ def get_slipo_codes() -> List[str]:
         "CAVE",
         "CINEMA",
         "CLOCK",
-        "EVENTVENUE",
+        # "EVENTVENUE",
         "FOUNTAIN",
         "GATE",
         "GLACIER",
@@ -75,14 +75,14 @@ def get_slipo_codes() -> List[str]:
         "RUINS",
         "SHELTER",
         "THEATRE",
-        "THEMEPARK",
+        # "THEMEPARK",
         "TOWER",
-        "TOWERCOMMUNICATION",
+        # "TOWERCOMMUNICATION",
         "VOLCANO",
-        "WATERMILL",
-        "WATERTOWER",
-        "WINDMILL",
+        # "WATERMILL",
+        # "WATERTOWER",
+        # "WINDMILL",
         "WRECK",
         "ZOO",
     ]
-    return sports + tourism
+    return {x.lower(): x for x in sports + tourism}
