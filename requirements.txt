@@ -11,7 +11,6 @@ Click==7.0
 cymem==2.0.3
 decorator==4.4.1
 defusedxml==0.6.0
-en-core-web-sm==2.2.5
 entrypoints==0.3
 flake8==3.7.9
 idna==2.8
@@ -64,6 +63,7 @@ requests==2.22.0
 Send2Trash==1.5.0
 six==1.13.0
 spacy==2.2.3
+https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.2.5/en_core_web_sm-2.2.5.tar.gz#egg=en_core_web_sm
 SPARQLWrapper==1.8.5
 srsly==0.2.0
 terminado==0.8.3
