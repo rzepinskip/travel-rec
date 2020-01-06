@@ -33,17 +33,27 @@ class ClimateSimilarity(BaseSimiliarity):
         top_words = []
 
         for word in words:
+            best_synonym = ''
+            best_similarity = 0
             for feature in self._mapping.keys():
-                a = wn.synsets(word)[0]
-                b = wn.synsets(feature)[0]
+                for a in wn.synsets(word):
+                    for b in wn.synsets(feature):
+                        similarity = a.path_similarity(b)
+                        if similarity is not None and similarity > best_similarity:
+                            best_synonym = feature
+                            best_similarity = similarity
 
-                similarity = a.path_similarity(b)
-                if similarity is not None and similarity > 0.8:
-                    top_words.append(feature)
+            if best_similarity > 0.8:
+                top_words.append(best_synonym)
+            else:
+                top_words.append(None)
 
         all_predicates = []
         for feature in top_words:
-            all_predicates.append(self._mapping[feature])
+            if feature is not None:
+                all_predicates.append(self._mapping[feature])
+            else:
+                all_predicates.append(None)
 
         return all_predicates
 
