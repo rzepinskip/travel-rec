@@ -38,10 +38,13 @@ class ClimateSimilarity(BaseSimiliarity):
             for feature in self._mapping.keys():
                 for a in wn.synsets(word):
                     for b in wn.synsets(feature):
-                        similarity = a.path_similarity(b)
-                        if similarity is not None and similarity > best_similarity:
-                            best_synonym = feature
-                            best_similarity = similarity
+                        try:
+                            similarity = a.path_similarity(b)
+                            if similarity is not None and similarity > best_similarity:
+                                best_synonym = feature
+                                best_similarity = similarity
+                        except:
+                            print(f"can't comapre {a} and {b}")
 
             if best_similarity > 0.8:
                 top_words.append(best_synonym)

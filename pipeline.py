@@ -13,6 +13,7 @@ from travelrec.sparql import (
     get_geofeatures,
     get_activities,
 )
+from travelrec.nlp_extender import NlpExtender
 
 
 nltk.download("wordnet", quiet=True)
@@ -28,9 +29,9 @@ activitySim = ActvitySimilarity()
 
 for example in examples:
     print(f"Query: {example}")
-    doc = nlp(example)
+    nlp_extended = NlpExtender(example)
     # location specification
-    location_entities = [x for x in doc.ents if x.label_ in ["GPE", "LOC"]]
+    location_entities = nlp_extended.location_entities()
     print(f"Locations: {location_entities}")
 
     loc = location_entities[0].text
@@ -38,9 +39,7 @@ for example in examples:
     print(f"Coordinates: {loc} - ({latitude}, {longitude})")
 
     # climate filters
-    climate_predicates = climateSim.construct_filters(
-        [x.lemma_ for x in doc if x.pos_ == "ADJ"]
-    )
+    climate_predicates = climateSim.construct_filters(nlp_extended.climate_terms())
     climate_predicate = climate_predicates[0]
     print(f"Climate: {climate_predicate}")
     nearby_cities = get_cities_with_temperature(
@@ -51,7 +50,7 @@ for example in examples:
     )
 
     # geofeatures ranking
-    nouns = [x.lemma_ for x in doc if x.pos_ == "NOUN"]
+    nouns = nlp_extended.nouns()
     geofeatures_codes = geoSim.construct_filters(nouns)
     print(f"Looking for geofeatures: {geofeatures_codes}")
 
