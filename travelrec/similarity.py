@@ -49,15 +49,8 @@ class ClimateSimilarity(BaseSimiliarity):
 
             if best_similarity > 0.8:
                 top_words.append(best_synonym)
-            else:
-                top_words.append(None)
 
-        all_predicates = []
-        for feature in top_words:
-            if feature is not None:
-                all_predicates.append(self._mapping[feature])
-            else:
-                all_predicates.append(None)
+        all_predicates = [self._mapping[feature] for feature in top_words]
 
         return all_predicates
 

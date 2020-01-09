@@ -6,6 +6,7 @@ from travelrec.processed_statement import ProcessedStatement
 @pytest.mark.parametrize("test_input, expected", [
     (['mild'], ['mild']),
     (['warm'], ['warm']),
+    (['warm', 'mild'], ['warm', 'mild']),
     # TODO: Wordnet - issue #3
     # (['medium'], ['mild']),
     # (['hot'], ['warm'])
