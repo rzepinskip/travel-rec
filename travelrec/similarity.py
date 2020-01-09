@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from nltk.corpus import wordnet as wn
+from nltk.corpus.reader.wordnet import WordNetError
 from travelrec.constants import get_slipo_codes, get_geonames_codes
 
 
@@ -43,8 +44,8 @@ class ClimateSimilarity(BaseSimiliarity):
                             if similarity is not None and similarity > best_similarity:
                                 best_synonym = feature
                                 best_similarity = similarity
-                        except:
-                            print(f"can't comapre {a} and {b}")
+                        except WordNetError as ex:
+                            pass
 
             if best_similarity > 0.8:
                 top_words.append(best_synonym)

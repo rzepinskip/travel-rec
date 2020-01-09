@@ -1,7 +1,7 @@
 from travelrec.similarity import ActvitySimilarity, ClimateSimilarity, GeoFeaturesSimilarity
 
 import unittest
-from travelrec.nlp_extender import NlpExtender
+from travelrec.processed_statement import ProcessedStatement
 
 class TestSimilarity(unittest.TestCase):
 
@@ -14,24 +14,21 @@ class TestSimilarity(unittest.TestCase):
 
         self.assertEqual(len(words), len(filters), 'number of filters is wrong')
 
-        for i in range(0, len(words)):
-            self.assertEqual(climateSim._mapping[correct_synonym[i]], filters[i], f'wrong synonym for {words[i]}')
+        for synonym, filter, word in zip(correct_synonym, filters, words):
+            self.assertEqual(climateSim._mapping[synonym], filter, f'wrong synonym for {word}')
 
     def test_geo_features_similarity(self):
         geoFeaturesSim = GeoFeaturesSimilarity()
         examples = ["swimming in Cracow", "mountains near Statue of Liberty", "lakes in Mazury", "mountains and lakes in Poland"]
         results = [[], ["T.MT", "T.MTS"], ["H.LK", "H.LKS"], ["T.MT", "T.MTS", "H.LK", "H.LKS"]]
 
-        for i in range(0, len(examples)):
-            example = examples[i]
-            nlp_extended = NlpExtender(example)
-            nouns = nlp_extended.nouns()
+        for example, result in zip(examples, results):
+            processed_statement = ProcessedStatement(example)
+            nouns = processed_statement.nouns()
 
             similarities = geoFeaturesSim.construct_filters(nouns)
 
-            self.assertEqual(len(similarities), len(results[i]))
-            for res in results[i]:
-                self.assertTrue(res in similarities, f"{res} is not in geoFeatures filters for '{example}'")
+            self.assertListEqual(sorted(similarities), sorted(result))
 
     def test_actvity_similarity(self):
         activitySim = ActvitySimilarity()
@@ -40,8 +37,8 @@ class TestSimilarity(unittest.TestCase):
 
         for i in range(0, len(examples)):
             example = examples[i]
-            nlp_extended = NlpExtender(example)
-            nouns = nlp_extended.nouns()
+            processed_statement = ProcessedStatement(example)
+            nouns = processed_statement.nouns()
 
             similarities = activitySim.construct_filters(nouns)
 

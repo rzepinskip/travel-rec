@@ -1,6 +1,6 @@
 import en_core_web_sm
 
-class NlpExtender():
+class ProcessedStatement():
     def __init__(self, statement):
         self.statement = statement
         self.nlp = en_core_web_sm.load()

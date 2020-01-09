@@ -1,16 +1,16 @@
 import unittest
 import en_core_web_sm
-from travelrec.nlp_extender import NlpExtender
+from travelrec.processed_statement import ProcessedStatement
 
-class TestNlpExtender(unittest.TestCase):
+class TestProcessedStatement(unittest.TestCase):
 
     def test_location_entities(self):
         examples = ["hot place in Paris", "sightseeing in Cracow", "swimming near Eiffel Tower", "swimming near Statue of Liberty", "warm place in the Tatra Mountains"]
         results = ["Paris", "Cracow", "Eiffel Tower", "Statue of Liberty", "the Tatra Mountains"]
         for i in range(0, len(examples)):
             example = examples[i]
-            nlp_extended = NlpExtender(example)
-            location_entities = nlp_extended.location_entities()
+            processed_statement = ProcessedStatement(example)
+            location_entities = processed_statement.location_entities()
 
             self.assertEqual(len(location_entities), 1)
             self.assertEqual(location_entities[0].text, results[i])
@@ -20,8 +20,8 @@ class TestNlpExtender(unittest.TestCase):
         results = ["sightseeing", "mountain", "lake", "swimming"]
         for i in range(0, len(examples)):
             example = examples[i]
-            nlp_extended = NlpExtender(example)
-            nouns = nlp_extended.nouns()
+            processed_statement = ProcessedStatement(example)
+            nouns = processed_statement.nouns()
 
             self.assertTrue(results[i] in nouns, f"noun in '{example}': found {nouns}, expected: {results[i]}")
 
@@ -30,8 +30,8 @@ class TestNlpExtender(unittest.TestCase):
         results = ["warm", "snowy", "mild"]
         for i in range(0, len(examples)):
             example = examples[i]
-            nlp_extended = NlpExtender(example)
-            climate_terms = nlp_extended.climate_terms()
+            processed_statement = ProcessedStatement(example)
+            climate_terms = processed_statement.climate_terms()
 
             self.assertEqual(len(climate_terms), 1)
             self.assertEqual(climate_terms[0], results[i])
