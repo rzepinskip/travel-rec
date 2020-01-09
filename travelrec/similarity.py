@@ -52,6 +52,9 @@ class ClimateSimilarity(BaseSimiliarity):
 
         all_predicates = [self._mapping[feature] for feature in top_words]
 
+        if len(all_predicates) == 0:
+            return [ClimatePredicate("yearMeanC", "?yearMeanC", [">-200"])]
+
         return all_predicates
 
 

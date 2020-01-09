@@ -20,7 +20,9 @@ nltk.download("wordnet", quiet=True)
 nlp = en_core_web_sm.load()
 
 examples = [
-    "mild places near Paris with mountains for swimming",
+    "places for swimming near Paris",
+    # "places near Paris with mountains for swimming",
+    # "mild places near Paris with mountains for swimming",
 ]
 
 climateSim = ClimateSimilarity()
@@ -61,15 +63,19 @@ for example in examples:
     results = []
     print("Calculating scores...")
     for city_latitude, city_longitude, city_name in nearby_cities:
-        geo_results = get_geofeatures(
-            city_latitude, city_longitude, 350, geofeatures_codes
-        )
-        geofeatures_count = len(geo_results["results"]["bindings"])
+        geofeatures_count = 0
+        if len(geofeatures_codes) > 0:
+            geo_results = get_geofeatures(
+                city_latitude, city_longitude, 350, geofeatures_codes
+            )
+            geofeatures_count = len(geo_results["results"]["bindings"])
 
-        activity_results = get_activities(
-            city_latitude, city_longitude, 4300, activities_codes
-        )
-        activities_count = len(activity_results["results"]["bindings"])
+        activities_count = 0
+        if len(activities_codes) > 0:
+            activity_results = get_activities(
+                city_latitude, city_longitude, 4300, activities_codes
+            )
+            activities_count = len(activity_results["results"]["bindings"])
 
         ranking_points = 2 * geofeatures_count + activities_count
         print(f"\t{city_name} with {ranking_points} points")
