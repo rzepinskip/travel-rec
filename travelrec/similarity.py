@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from nltk.corpus import wordnet as wn
+from nltk.corpus.reader.wordnet import WordNetError
 from travelrec.constants import get_slipo_codes, get_geonames_codes
 
 
@@ -33,17 +34,23 @@ class ClimateSimilarity(BaseSimiliarity):
         top_words = []
 
         for word in words:
+            best_synonym = ''
+            best_similarity = 0
             for feature in self._mapping.keys():
-                a = wn.synsets(word)[0]
-                b = wn.synsets(feature)[0]
+                for a in wn.synsets(word):
+                    for b in wn.synsets(feature):
+                        try:
+                            similarity = a.path_similarity(b)
+                            if similarity is not None and similarity > best_similarity:
+                                best_synonym = feature
+                                best_similarity = similarity
+                        except WordNetError as ex:
+                            pass
 
-                similarity = a.path_similarity(b)
-                if similarity is not None and similarity > 0.8:
-                    top_words.append(feature)
+            if best_similarity > 0.8:
+                top_words.append(best_synonym)
 
-        all_predicates = []
-        for feature in top_words:
-            all_predicates.append(self._mapping[feature])
+        all_predicates = [self._mapping[feature] for feature in top_words]
 
         return all_predicates
 
