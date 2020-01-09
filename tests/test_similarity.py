@@ -1,47 +1,54 @@
-from travelrec.similarity import ActvitySimilarity, ClimateSimilarity, GeoFeaturesSimilarity
+import pytest
 
-import unittest
+from travelrec.similarity import ActvitySimilarity, ClimateSimilarity, GeoFeaturesSimilarity
 from travelrec.processed_statement import ProcessedStatement
 
-class TestSimilarity(unittest.TestCase):
+@pytest.mark.parametrize("test_input, expected", [
+    (['mild'], ['mild']),
+    (['warm'], ['warm']),
+    # TODO: Wordnet - issue #3
+    # (['medium'], ['mild']),
+    # (['hot'], ['warm'])
+    ])
+def test_climate_similarity(test_input, expected):
+    climateSim = ClimateSimilarity()
 
-    def test_climate_similarity(self):
-        climateSim = ClimateSimilarity()
-        words = ['mild', 'warm']#, 'medium', 'hot']
-        correct_synonym = ['mild', 'warm']#, 'mild', 'warm']
+    filters = climateSim.construct_filters(test_input)
 
-        filters = climateSim.construct_filters(words)
+    assert len(expected) == len(filters)
 
-        self.assertEqual(len(words), len(filters), 'number of filters is wrong')
+    for synonym, filter, word in zip(expected, filters, test_input):
+        assert climateSim._mapping[synonym] == filter
 
-        for synonym, filter, word in zip(correct_synonym, filters, words):
-            self.assertEqual(climateSim._mapping[synonym], filter, f'wrong synonym for {word}')
+@pytest.mark.parametrize("test_input, expected", [
+    ('swimming in Cracow', []),
+    ('mountains near Statue of Liberty', ["T.MT", "T.MTS"]),
+    ('lakes in Mazury', ["H.LK", "H.LKS"]),
+    ('mountains and lakes in Poland', ["T.MT", "T.MTS", "H.LK", "H.LKS"]),
+    ])
+def test_geo_features_similarity(test_input, expected):
+    geoFeaturesSim = GeoFeaturesSimilarity()
 
-    def test_geo_features_similarity(self):
-        geoFeaturesSim = GeoFeaturesSimilarity()
-        examples = ["swimming in Cracow", "mountains near Statue of Liberty", "lakes in Mazury", "mountains and lakes in Poland"]
-        results = [[], ["T.MT", "T.MTS"], ["H.LK", "H.LKS"], ["T.MT", "T.MTS", "H.LK", "H.LKS"]]
+    processed_statement = ProcessedStatement(test_input)
+    nouns = processed_statement.nouns()
 
-        for example, result in zip(examples, results):
-            processed_statement = ProcessedStatement(example)
-            nouns = processed_statement.nouns()
+    similarities = geoFeaturesSim.construct_filters(nouns)
 
-            similarities = geoFeaturesSim.construct_filters(nouns)
+    assert sorted(similarities) == sorted(expected)
 
-            self.assertListEqual(sorted(similarities), sorted(result))
+@pytest.mark.parametrize("test_input, expected", [
+    ('mountains near Statue of Liberty', []),
+    ('basketball in Cracow', ['BASKETBALL']),
+    ('a ZOO and gym near Statue of Liberty', ['ZOO', 'GYM']),
+    ('cinemas in Mazury', ['CINEMA']),
+    ('swimming in Poland', ['SWIMMING']),
+    ])
+def test_actvity_similarity(test_input, expected):
+    activitySim = ActvitySimilarity()
 
-    def test_actvity_similarity(self):
-        activitySim = ActvitySimilarity()
-        examples = ["mountains near Statue of Liberty", "basketball in Cracow", "a ZOO and gym near Statue of Liberty", "cinemas in Mazury", "swimming in Poland"]
-        results = [[], ["BASKETBALL"], ["ZOO", "GYM"], ["CINEMA"], ["SWIMMING"]]
+    processed_statement = ProcessedStatement(test_input)
+    nouns = processed_statement.nouns()
 
-        for i in range(0, len(examples)):
-            example = examples[i]
-            processed_statement = ProcessedStatement(example)
-            nouns = processed_statement.nouns()
+    similarities = activitySim.construct_filters(nouns)
 
-            similarities = activitySim.construct_filters(nouns)
-
-            self.assertEqual(len(similarities), len(results[i]))
-            for res in results[i]:
-                self.assertTrue(res in similarities, f"{res} is not in activity filters for '{example}'")
+    assert sorted(similarities) == sorted(expected)
