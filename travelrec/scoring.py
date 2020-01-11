@@ -1,8 +1,13 @@
-from multiprocessing.dummy import Pool as ThreadPool
+from concurrent.futures import ThreadPoolExecutor
 from travelrec.sparql import (
     get_geofeatures,
     get_activities,
 )
+
+def multithreading(func, args, workers):
+    with ThreadPoolExecutor(workers) as ex:
+        res = ex.map(func, args)
+    return list(res)
 
 class Scoring:
     def __init__(self, cities, geofeatures_codes, activities_codes, search_distances):
@@ -33,8 +38,5 @@ class Scoring:
 
     def score_cities_parallelly(self):
         threads = len(self.cities)
-        pool = ThreadPool(threads)
-        results = pool.map(self.score_city, self.cities)
-        pool.close()
-        pool.join()
+        results = multithreading(self.score_city, self.cities, threads)
         return results
