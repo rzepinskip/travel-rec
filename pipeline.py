@@ -16,6 +16,11 @@ from travelrec.sparql import (
 from travelrec.processed_statement import ProcessedStatement
 from travelrec.scoring import Scoring
 
+search_distances = {
+    'climate': 300,
+    'geofeatures': 150,
+    'activities': 75
+}
 
 nltk.download("wordnet", quiet=True)
 nlp = en_core_web_sm.load()
@@ -46,7 +51,7 @@ for example in examples:
     climate_predicate = climate_predicates[0]
     print(f"Climate: {climate_predicate}")
     nearby_cities = get_cities_with_temperature(
-        latitude, longitude, 150, climate_predicate
+        latitude, longitude, search_distances['climate'], climate_predicate
     )
     print(
         f"Found {len(nearby_cities)} cities nearby: {[x for _, _, x in nearby_cities]}"
@@ -63,7 +68,7 @@ for example in examples:
 
     results = []
     print("Calculating scores...")
-    scoring = Scoring(nearby_cities, geofeatures_codes, activities_codes)
+    scoring = Scoring(nearby_cities, geofeatures_codes, activities_codes, search_distances)
     results = scoring.score_cities_parallelly()
 
     print(f"Final ranking: {[x for x, _ in sorted(results, key=lambda x: -x[1])]}")

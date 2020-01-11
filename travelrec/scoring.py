@@ -5,24 +5,25 @@ from travelrec.sparql import (
 )
 
 class Scoring:
-    def __init__(self, cities, geofeatures_codes, activities_codes):
+    def __init__(self, cities, geofeatures_codes, activities_codes, search_distances):
         self.cities = cities
         self.geofeatures_codes = geofeatures_codes
         self.activities_codes = activities_codes
+        self.search_distances = search_distances
 
     def score_city(self, city):
         city_latitude, city_longitude, city_name = city
         geofeatures_count = 0
         if len(self.geofeatures_codes) > 0:
             geo_results = get_geofeatures(
-                city_latitude, city_longitude, 350, self.geofeatures_codes
+                city_latitude, city_longitude, self.search_distances['geofeatures'], self.geofeatures_codes
             )
             geofeatures_count = len(geo_results["results"]["bindings"])
 
         activities_count = 0
         if len(self.activities_codes) > 0:
             activity_results = get_activities(
-                city_latitude, city_longitude, 4300, self.activities_codes
+                city_latitude, city_longitude, self.search_distances['activities'], self.activities_codes
             )
             activities_count = len(activity_results["results"]["bindings"])
 
