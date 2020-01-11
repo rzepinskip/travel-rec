@@ -15,6 +15,11 @@ from travelrec.sparql import (
 )
 from travelrec.processed_statement import ProcessedStatement
 
+search_distances = {
+    'climate': 300,
+    'geofeatures': 150,
+    'activities': 75
+}
 
 nltk.download("wordnet", quiet=True)
 nlp = en_core_web_sm.load()
@@ -43,7 +48,7 @@ for example in examples:
     climate_predicate = climate_predicates[0]
     print(f"Climate: {climate_predicate}")
     nearby_cities = get_cities_with_temperature(
-        latitude, longitude, 150, climate_predicate
+        latitude, longitude, search_distances['climate'], climate_predicate
     )
     print(
         f"Found {len(nearby_cities)} cities nearby: {[x for _, _, x in nearby_cities]}"
@@ -62,12 +67,12 @@ for example in examples:
     print("Calculating scores...")
     for city_latitude, city_longitude, city_name in nearby_cities:
         geo_results = get_geofeatures(
-            city_latitude, city_longitude, 350, geofeatures_codes
+            city_latitude, city_longitude, search_distances['geofeatures'], geofeatures_codes
         )
         geofeatures_count = len(geo_results["results"]["bindings"])
 
         activity_results = get_activities(
-            city_latitude, city_longitude, 4300, activities_codes
+            city_latitude, city_longitude, search_distances['activities'], activities_codes
         )
         activities_count = len(activity_results["results"]["bindings"])
 
