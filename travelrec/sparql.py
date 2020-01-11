@@ -96,7 +96,7 @@ def get_activities(latitude, longitude, max_distance, actitivies):
         ?fCategory slipo:value ?fCategory_Val .
         ?uri geo:hasGeometry ?fGeometry .
             ?fGeometry geo:asWKT ?fWKT .
-            BIND (bif:st_distance(bif:st_point({latitude}, {longitude}), ?fWKT ) AS ?distance_km) .
+            BIND (bif:st_distance(bif:st_point({longitude}, {latitude}), ?fWKT ) AS ?distance_km) .
             FILTER (?distance_km < {max_distance} && ?fCategory_Val IN ({", ".join(actitivies_quoted)}))
         }}
     ORDER BY ?distance_km		              

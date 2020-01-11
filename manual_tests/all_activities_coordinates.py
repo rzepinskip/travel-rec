@@ -1,6 +1,6 @@
 from SPARQLWrapper import SPARQLWrapper, JSON
-from geomet import wkt
 from travelrec.constants import get_slipo_codes
+from manual_tests.coordinates_to_file import coordinates_to_file
 
 sparql = SPARQLWrapper(
     "http://geoknow-server.imis.athena-innovation.gr:11480/sparql"
@@ -25,10 +25,7 @@ WHERE {{
 sparql.setQuery(query)
 sparql.setReturnFormat(JSON)
 results = sparql.query().convert()
-points = [wkt.loads(el['fWKT']['value'])['coordinates'] for el in results['results']['bindings']]
 
-with open('helpers/points.txt', 'w') as f:
-    for point in points:
-        f.write(f'{point[0]}\t{point[1]}\n')
+coordinates_to_file(results, 'manual_tests/points.txt')
 
 # then project it in http://dwtkns.com/pointplotter/
