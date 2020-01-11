@@ -31,7 +31,8 @@ class Scoring:
         print(f"\t{city_name} with {ranking_points} points")
         return(city_name, ranking_points)
 
-    def score_cities_parallelly(self, threads=2):
+    def score_cities_parallelly(self):
+        threads = len(self.cities)
         pool = ThreadPool(threads)
         results = pool.map(self.score_city, self.cities)
         pool.close()
