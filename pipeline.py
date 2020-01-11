@@ -14,7 +14,7 @@ from travelrec.sparql import (
     get_activities,
 )
 from travelrec.processed_statement import ProcessedStatement
-from travelrec.scoring import Scoring
+from travelrec.scoring import score_cities_parallelly
 
 search_distances = {
     'climate': 300,
@@ -68,8 +68,7 @@ for example in examples:
 
     results = []
     print("Calculating scores...")
-    scoring = Scoring(nearby_cities, geofeatures_codes, activities_codes, search_distances)
-    results = scoring.score_cities_parallelly()
+    results = score_cities_parallelly(nearby_cities, geofeatures_codes, activities_codes, search_distances)
 
     print(f"Final ranking: {[x for x, _ in sorted(results, key=lambda x: -x[1])]}")
 
