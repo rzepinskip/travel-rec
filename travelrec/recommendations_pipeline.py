@@ -63,7 +63,7 @@ def recommendations_pipeline(query, nlp, verbose=False):
         print("Calculating scores...")
     results = score_cities_parallelly(nearby_cities, geofeatures_codes, activities_codes, search_distances, verbose)
 
-    final_ranking = [x for x, _ in sorted(results, key=lambda x: -x[1])]
+    final_ranking = sorted(results, key=lambda x: -x['score'])
     if verbose:
         print(f"Final ranking: {final_ranking}")
 

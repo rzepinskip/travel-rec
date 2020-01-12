@@ -25,7 +25,7 @@ def score_city(city, params):
     ranking_points = 2 * geofeatures_count + activities_count
     if verbose:
         print(f"\t{city_name} with {ranking_points} points")
-    return(city_name, ranking_points)
+    return { 'name': city_name, 'score': ranking_points }
 
 def score_cities_parallelly(cities, geofeatures_codes, activities_codes, search_distances, verbose = False):
     threads = len(cities)

@@ -18,10 +18,12 @@
         <tr>
           <th>lp</th>
           <th>Name</th>
+          <th>Score</th>
         </tr>
         <tr *ngFor="let rec of recommendations; let i=index">
           <td>{{ i + 1 }}</td>
-          <td>{{ rec }}</td>
+          <td>{{ rec.name }}</td>
+          <td>{{ rec.score }}</td>
         </tr>
       </table>
 
