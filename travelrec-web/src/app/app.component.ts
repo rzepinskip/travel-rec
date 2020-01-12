@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild, ElementRef } from '@angular/core';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { HttpClient } from '@angular/common/http';
 import { environment } from './../environments/environment';
@@ -11,18 +11,24 @@ import { environment } from './../environments/environment';
 export class AppComponent {
   title = 'travelrec-web';
 
+  @ViewChild('queryInput') queryInput: ElementRef;
+
+  recommendations = [];
+  query: string;
+
   constructor(
     private spinner: NgxSpinnerService,
     private http: HttpClient
-    ) {}
+  ) { }
 
   search() {
     this.spinner.show();
-    console.log(environment.apiUrl);
-    this.http.get(environment.apiUrl + 'recommendations/Paris').subscribe((res) => {
-      console.log(res);
-    },
-    () => {},
-    () => this.spinner.hide());
+    if (this.query !== '') {
+      this.http.get(environment.apiUrl + 'recommendations/' + this.query).subscribe((res: any[]) => {
+        this.recommendations = res;
+      },
+        () => { },
+        () => this.spinner.hide());
+    }
   }
 }
