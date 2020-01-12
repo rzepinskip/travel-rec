@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 @Component({
   selector: 'app-root',
@@ -7,4 +8,10 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'travelrec-web';
+
+  constructor(private spinner: NgxSpinnerService) {}
+
+  search() {
+    this.spinner.show();
+  }
 }

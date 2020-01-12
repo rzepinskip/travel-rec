@@ -14,10 +14,13 @@ def api_recommendations(query):
     recs = recommendations_pipeline(query, nlp, debug)
     return json.dumps(recs)
 
-@app.route('/app/<path:path>')
+@app.route('/app/<path:path>', methods=['GET'])
 def app_path(path):
-    print(path)
-    return send_from_directory('web', path)
+    return send_from_directory('travelrec-web/dist/travelrec-web/', path)
+
+@app.route('/app/')
+def app_path_index():
+    return send_from_directory('travelrec-web/dist/travelrec-web/', 'index.html')
 
 if __name__ == "__main__":
     app.run(debug=debug)
