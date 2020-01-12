@@ -1,9 +1,11 @@
 from flask import Flask, send_from_directory
+from flask_cors import CORS
 import en_core_web_sm
 import json
 from travelrec.recommendations_pipeline import recommendations_pipeline
 
 app = Flask(__name__)
+CORS(app)
 
 nlp = en_core_web_sm.load()
 
