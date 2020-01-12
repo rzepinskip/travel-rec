@@ -7,9 +7,11 @@ app = Flask(__name__)
 
 nlp = en_core_web_sm.load()
 
+debug = True
+
 @app.route('/api/recommendations/<query>')
 def api_recommendations(query):
-    recs = recommendations_pipeline(query, nlp)
+    recs = recommendations_pipeline(query, nlp, debug)
     return json.dumps(recs)
 
 @app.route('/app/<path:path>')
@@ -18,4 +20,4 @@ def app_path(path):
     return send_from_directory('web', path)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=debug)

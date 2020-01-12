@@ -7,7 +7,7 @@ from itertools import repeat
 
 def score_city(city, params):
     city_latitude, city_longitude, city_name = city
-    geofeatures_codes, activities_codes, search_distances = params
+    geofeatures_codes, activities_codes, search_distances, verbose = params
     geofeatures_count = 0
     if len(geofeatures_codes) > 0:
         geo_results = get_geofeatures(
@@ -23,11 +23,12 @@ def score_city(city, params):
         activities_count = len(activity_results["results"]["bindings"])
 
     ranking_points = 2 * geofeatures_count + activities_count
-    print(f"\t{city_name} with {ranking_points} points")
+    if verbose:
+        print(f"\t{city_name} with {ranking_points} points")
     return(city_name, ranking_points)
 
-def score_cities_parallelly(cities, geofeatures_codes, activities_codes, search_distances):
+def score_cities_parallelly(cities, geofeatures_codes, activities_codes, search_distances, verbose = False):
     threads = len(cities)
     with ThreadPoolExecutor(threads) as ex:
-        res = ex.map(score_city, cities, repeat( (geofeatures_codes, activities_codes, search_distances) ))
+        res = ex.map(score_city, cities, repeat( (geofeatures_codes, activities_codes, search_distances, verbose) ))
     return list(res)
