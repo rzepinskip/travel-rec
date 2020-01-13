@@ -4,10 +4,11 @@ from travelrec.sparql import (
     get_activities,
 )
 from itertools import repeat
+import logging
 
 def score_city(city, params):
     city_latitude, city_longitude, city_name = city
-    geofeatures_codes, activities_codes, search_distances, verbose = params
+    geofeatures_codes, activities_codes, search_distances = params
     geofeatures_count = 0
     if len(geofeatures_codes) > 0:
         geo_results = get_geofeatures(
@@ -35,12 +36,11 @@ def score_city(city, params):
             } for act in activiteis_res]
 
     ranking_points = 2 * geofeatures_count + activities_count
-    if verbose:
-        print(f"\t{city_name} with {ranking_points} points")
+    logging.info(f"\t{city_name} with {ranking_points} points")
     return { 'name': city_name, 'score': ranking_points, 'geofeatures_places': geofeatures_places, 'activities_places': activities_places }
 
-def score_cities_parallelly(cities, geofeatures_codes, activities_codes, search_distances, verbose = False):
+def score_cities_parallelly(cities, geofeatures_codes, activities_codes, search_distances):
     threads = len(cities)
     with ThreadPoolExecutor(threads) as ex:
-        res = ex.map(score_city, cities, repeat( (geofeatures_codes, activities_codes, search_distances, verbose) ))
+        res = ex.map(score_city, cities, repeat( (geofeatures_codes, activities_codes, search_distances) ))
     return list(res)
