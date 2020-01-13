@@ -12,8 +12,11 @@ export class AppComponent {
   title = 'travelrec-web';
 
   @ViewChild('queryInput') queryInput: ElementRef;
+  @ViewChild('lgModal') lgModal: any;
 
   recommendations = [];
+  detailsList = [];
+  modalName = '';
   query: string;
 
   constructor(
@@ -30,5 +33,19 @@ export class AppComponent {
         () => { },
         () => this.spinner.hide());
     }
+  }
+
+  openDetailsList(city_name, rec: any[]) {
+    this.modalName = city_name;
+    this.detailsList = rec;
+    this.lgModal.show();
+
+    return false;
+  }
+
+  wktToGoogleMapsSearchString(wkt: string) {
+    const coords = wkt.substring(wkt.indexOf('(') + 1, wkt.lastIndexOf(')'));
+    const coordsTab = coords.split(' ');
+    return coordsTab[1] + ' ' + coordsTab[0];
   }
 }

@@ -26,9 +26,12 @@
           <td>{{ rec.name }} (<a href="https://www.google.pl/maps/place/{{ rec.name }}" target="_blank">map</a>)</td>
           <td>{{ rec.score }}</td>
           <td class="smaller">
-            Found {{ rec.activities_places.length }} places suitable for indicated activities
-            <br>
             Found {{ rec.geofeatures_places.length }} suitable geofeatures
+            <a href="#" (click)="openDetailsList(rec.name + ' - geofeatures', rec.geofeatures_places)">Show</a>
+            <br>
+            Found {{ rec.activities_places.length }} places suitable for indicated activities
+            <a href="#" (click)="openDetailsList(rec.name + ' - activities', rec.activities_places)">Show</a>
+            <br>
           </td>
         </tr>
       </table>
@@ -37,5 +40,39 @@
       </ngx-spinner>
     </div>
 
+  </div>
+</div>
+
+
+<div bsModal #lgModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 id="dialog-sizes-name1" class="modal-title pull-left">{{ modalName }}</h4>
+        <button type="button" class="close pull-right" (click)="lgModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="col-12 results">
+          <table class="table" *ngIf="detailsList.length > 0">
+            <tr>
+              <th>lp</th>
+              <th>Name</th>
+              <th>Distance</th>
+            </tr>
+            <tr *ngFor="let el of detailsList; let i=index">
+              <td>{{ i + 1 }}</td>
+              <td>{{ el.name }} (<a href="https://www.google.pl/maps/place/{{ wktToGoogleMapsSearchString(el.coordinates) }}" target="_blank">map</a>)
+              </td>
+              <td>{{ el.distance | number : '1.2-2' }} km</td>
+            </tr>
+          </table>
+          <span *ngIf="detailsList.length === 0">
+            Nothing found
+          </span>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
