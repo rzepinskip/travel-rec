@@ -19,11 +19,17 @@
           <th>lp</th>
           <th>Name</th>
           <th>Score</th>
+          <th>Details</th>
         </tr>
         <tr *ngFor="let rec of recommendations; let i=index">
           <td>{{ i + 1 }}</td>
-          <td>{{ rec.name }}</td>
+          <td>{{ rec.name }} (<a href="https://www.google.pl/maps/place/{{ rec.name }}" target="_blank">map</a>)</td>
           <td>{{ rec.score }}</td>
+          <td class="smaller">
+            Found {{ rec.activities_places.length }} places suitable for indicated activities
+            <br>
+            Found {{ rec.geofeatures_places.length }} suitable geofeatures
+          </td>
         </tr>
       </table>
 

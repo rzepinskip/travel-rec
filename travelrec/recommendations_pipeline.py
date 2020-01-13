@@ -65,6 +65,6 @@ def recommendations_pipeline(query, nlp, verbose=False):
 
     final_ranking = sorted(results, key=lambda x: -x['score'])
     if verbose:
-        print(f"Final ranking: {final_ranking}")
+        print(f"Final ranking: {[city['name'] for city in final_ranking]}")
 
     return final_ranking

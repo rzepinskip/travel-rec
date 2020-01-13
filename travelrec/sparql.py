@@ -58,21 +58,26 @@ def get_geofeatures(latitude, longitude, max_distance, geo_features):
     PREFIX rank: <http://www.ontotext.com/owlim/RDFRank#>
     PREFIX gn: <http://www.geonames.org/ontology#>
     PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+    PREFIX dbp: <http://dbpedia.org/property/>
+    PREFIX omgeo: <http://www.ontotext.com/owlim/geo#>
 
-    SELECT DISTINCT ?object ?lat ?long 
+    SELECT DISTINCT ?object ?name ?lat ?long ?distance_km
     WHERE {{
         {{
-            SELECT ?object ?lat ?long
+            SELECT ?object ?name ?lat ?long ?distance_km
             WHERE {{
                 ?object gdb-geo:nearby({latitude} {longitude} "{max_distance}km");
                         gn:featureCode ?featureCode;
                         geo-pos:lat ?lat;
                         geo-pos:long ?long;
+                        dbp:name ?name;
+                BIND (omgeo:distance({latitude}, {longitude}, ?lat, ?long) AS ?distance_km).
                 FILTER(?featureCode IN ({", ".join(prefixed_geo_features)})) 
             }}
         }}
         FILTER(datatype(?lat) = xsd:float && datatype(?long) = xsd:float)
     }}
+    ORDER BY ?distance_km
     """
     sparql.setQuery(query)
     sparql.setReturnFormat(JSON)
@@ -99,7 +104,7 @@ def get_activities(latitude, longitude, max_distance, actitivies):
             BIND (bif:st_distance(bif:st_point({longitude}, {latitude}), ?fWKT ) AS ?distance_km) .
             FILTER (?distance_km < {max_distance} && ?fCategory_Val IN ({", ".join(actitivies_quoted)}))
         }}
-    ORDER BY ?distance_km		              
+    ORDER BY ?distance_km
     """
     sparql.setQuery(query)
     sparql.setReturnFormat(JSON)
