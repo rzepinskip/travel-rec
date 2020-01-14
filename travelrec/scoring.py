@@ -6,6 +6,9 @@ from travelrec.sparql import (
 from itertools import repeat
 import logging
 
+def calculate_feature_score(max_distance: float, distance: float):
+    return (max_distance - distance) / max_distance
+
 def score_city(city, params):
     city_latitude, city_longitude, city_name = city
     geofeatures_codes, activities_codes, search_distances = params
@@ -19,7 +22,7 @@ def score_city(city, params):
             'name': gf['name']['value'],
             'coordinates': f"POINT({gf['long']['value']} {gf['lat']['value']})",
             'distance': gf['distance_km']['value'],
-            'score': (search_distances['geofeatures'] - float(gf['distance_km']['value'])) / search_distances['geofeatures']
+            'score': calculate_feature_score(search_distances['geofeatures'], float(gf['distance_km']['value']))
             } for gf in geofeatures_res]
         geofeatures_score = sum(place['score'] for place in geofeatures_places)
 
@@ -33,7 +36,7 @@ def score_city(city, params):
             'name': act['name']['value'],
             'coordinates': act['fWKT']['value'],
             'distance': act['distance_km']['value'],
-            'score': (search_distances['activities'] - float(act['distance_km']['value'])) / search_distances['activities']
+            'score': calculate_feature_score(search_distances['activities'], float(act['distance_km']['value']))
             } for act in activiteis_res]
         activities_score = sum(place['score'] for place in activities_places)
 
