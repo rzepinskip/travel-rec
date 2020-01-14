@@ -15,12 +15,13 @@ def score_city(city, params):
             city_latitude, city_longitude, search_distances['geofeatures'], geofeatures_codes
         )
         geofeatures_res = geo_results["results"]["bindings"]
-        geofeatures_count = len(geofeatures_res)
         geofeatures_places = [{
             'name': gf['name']['value'],
             'coordinates': f"POINT({gf['long']['value']} {gf['lat']['value']})",
-            'distance': gf['distance_km']['value']
-            } for gf in geofeatures_res] 
+            'distance': gf['distance_km']['value'],
+            'score': (search_distances['geofeatures'] - float(gf['distance_km']['value'])) / search_distances['geofeatures']
+            } for gf in geofeatures_res]
+        geofeatures_score = sum(place['score'] for place in geofeatures_places)
 
     activities_count = 0
     if len(activities_codes) > 0:
@@ -28,14 +29,15 @@ def score_city(city, params):
             city_latitude, city_longitude, search_distances['activities'], activities_codes
         )
         activiteis_res = activity_results["results"]["bindings"]
-        activities_count = len(activiteis_res)
         activities_places = [{
             'name': act['name']['value'],
             'coordinates': act['fWKT']['value'],
-            'distance': act['distance_km']['value']
+            'distance': act['distance_km']['value'],
+            'score': (search_distances['activities'] - float(act['distance_km']['value'])) / search_distances['activities']
             } for act in activiteis_res]
+        activities_score = sum(place['score'] for place in activities_places)
 
-    ranking_points = 2 * geofeatures_count + activities_count
+    ranking_points = geofeatures_score + activities_score
     logging.info(f"\t{city_name} with {ranking_points} points")
     return { 'name': city_name, 'score': ranking_points, 'geofeatures_places': geofeatures_places, 'activities_places': activities_places }
 
