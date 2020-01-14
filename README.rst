@@ -8,6 +8,9 @@ Usage
 
 Installation
 ------------
+1. Install node.js and Angular CLI as described in https://angular.io/guide/setup-local
+2. In ``\travelrec-web`` run ``npm install`` than ``ng build --base-href /app/ --prod``
+3. Run ``\server.py`` and browse ``http://127.0.0.1:5000/app/``
 
 Requirements
 ^^^^^^^^^^^^

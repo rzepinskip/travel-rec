@@ -14,6 +14,8 @@ decorator==4.4.1
 defusedxml==0.6.0
 entrypoints==0.3
 flake8==3.7.9
+Flask==1.1.1
+Flask-Cors==3.0.8
 future==0.18.2
 geocoder==1.38.1
 geomet==0.2.1
