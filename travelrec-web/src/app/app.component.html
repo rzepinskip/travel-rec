@@ -24,7 +24,7 @@
         <tr *ngFor="let rec of recommendations; let i=index">
           <td>{{ i + 1 }}</td>
           <td>{{ rec.name }} (<a href="https://www.google.pl/maps/place/{{ rec.name }}" target="_blank">map</a>)</td>
-          <td>{{ rec.score }}</td>
+          <td>{{ rec.score | number : '1.2-2' }}</td>
           <td class="smaller">
             Found {{ rec.geofeatures_places.length }} suitable geofeatures
             <a href="#" (click)="openDetailsList(rec.name + ' - geofeatures', rec.geofeatures_places)">Show</a>
@@ -60,12 +60,14 @@
               <th>lp</th>
               <th>Name</th>
               <th>Distance</th>
+              <th>Score</th>
             </tr>
             <tr *ngFor="let el of detailsList; let i=index">
               <td>{{ i + 1 }}</td>
               <td>{{ el.name }} (<a href="https://www.google.pl/maps/place/{{ wktToGoogleMapsSearchString(el.coordinates) }}" target="_blank">map</a>)
               </td>
               <td>{{ el.distance | number : '1.2-2' }} km</td>
+              <td>{{ el.score | number : '1.2-2' }}</td>
             </tr>
           </table>
           <span *ngIf="detailsList.length === 0">
