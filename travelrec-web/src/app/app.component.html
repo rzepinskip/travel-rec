@@ -14,7 +14,7 @@
       </form>
     </div>
 
-    <div class="col-12 results">
+    <div *ngIf="!errorMessage" class="col-12 results">
       <table class="table" *ngIf="recommendations.length > 0">
         <tr>
           <th>lp</th>
@@ -39,6 +39,12 @@
 
       <ngx-spinner [fullScreen]="false" type="line-scale-party" size="medium" bdColor="rgba(51,51,51,0.7)">
       </ngx-spinner>
+    </div>
+
+    <div *ngIf="errorMessage" class="col-12">
+      <div class="alert alert-danger w-100" role="alert">
+        {{ errorMessage }}
+      </div>
     </div>
 
   </div>

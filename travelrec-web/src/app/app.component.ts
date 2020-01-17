@@ -15,9 +15,16 @@ export class AppComponent {
   @ViewChild('lgModal') lgModal: any;
 
   recommendations = [];
+  errorMessage = null;
   detailsList = [];
   modalName = '';
   query: string;
+
+  errors = {
+    1: "Sorry, we didn't find any location in your query.",
+    2: "Sorry, we didn't find any places around.",
+    3: "Sorry, we didn't find any places meeting the climate conditions.",
+  };
 
   constructor(
     private spinner: NgxSpinnerService,
@@ -26,9 +33,15 @@ export class AppComponent {
 
   search() {
     this.spinner.show();
+    this.recommendations = [];
+    this.errorMessage = null;
     if (this.query !== '') {
       this.http.get(environment.apiUrl + 'recommendations/' + this.query).subscribe((res: any[]) => {
-        this.recommendations = res;
+        if (!Array.isArray(res)) {
+          this.errorMessage = this.errors[res];
+        } else {
+          this.recommendations = res;
+        }
       },
         () => { },
         () => this.spinner.hide());

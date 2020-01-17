@@ -23,6 +23,14 @@ class NoLocationsFoundError(Exception):
     """Raised when no locations were found based on provided query"""
     pass
 
+class NoNearbyCitiesWithTemperatureFoundError(Exception):
+    """Raised when no cities with temperature were found"""
+    pass
+
+class NoNearbyCitiesWithClimateFoundError(Exception):
+    """Raised when getting cities with specified climate results with empty list"""
+    pass
+
 def recommendations_pipeline(query, nlp, verbose=False):
     if verbose:
         logging.basicConfig(level=logging.INFO)
@@ -48,12 +56,18 @@ def recommendations_pipeline(query, nlp, verbose=False):
     climate_predicates = climateSim.construct_filters(processed_statement.climate_terms())
     logging.info(f"Climate: {climate_predicates}")
     nearby_cities = []
-    for loc in location_coordinates:
+    for coord in location_coordinates:
         nearby_cities.extend(get_cities_with_temperature(
-            loc[0], loc[1], search_distances['climate'], climate_predicates
+            coord[0], coord[1], search_distances['climate'], climate_predicates
         ))
     nearby_cities = list(set(nearby_cities))
     logging.info(f"Found {len(nearby_cities)} cities nearby: {[x for _, _, x in nearby_cities]}")
+
+    if len(nearby_cities) == 0:
+        if len(climate_predicates) == 0:
+            raise NoNearbyCitiesWithTemperatureFoundError
+        else:
+            raise NoNearbyCitiesWithClimateFoundError
 
     # geofeatures ranking
     nouns = processed_statement.nouns()
