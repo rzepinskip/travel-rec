@@ -19,6 +19,10 @@ search_distances = {
     'activities': 75
 }
 
+class NoLocationsFoundError(Exception):
+    """Raised when no locations were found based on provided query"""
+    pass
+
 def recommendations_pipeline(query, nlp, verbose=False):
     if verbose:
         logging.basicConfig(level=logging.INFO)
@@ -32,16 +36,20 @@ def recommendations_pipeline(query, nlp, verbose=False):
     location_entities = processed_statement.location_entities()
     logging.info(f"Locations: {location_entities}")
 
-    loc = location_entities[0].text
-    latitude, longitude = get_location(loc)
-    logging.info(f"Coordinates: {loc} - ({latitude}, {longitude})")
+    if len(location_entities) == 0:
+        raise NoLocationsFoundError
+
+    location_coordinates = [get_location(loc.text) for loc in location_entities]
+    logging.info("Coordinates:")
+    for loc, coord in zip(location_entities, location_coordinates):
+        logging.info(f"\t{loc} - ({coord[0]}, {coord[1]})")
 
     # climate filters
     climate_predicates = climateSim.construct_filters(processed_statement.climate_terms())
-    climate_predicate = climate_predicates[0]
-    logging.info(f"Climate: {climate_predicate}")
+    logging.info(f"Climate: {climate_predicates}")
+    loc = location_coordinates[0]
     nearby_cities = get_cities_with_temperature(
-        latitude, longitude, search_distances['climate'], climate_predicate
+        loc[0], loc[1], search_distances['climate'], climate_predicates
     )
     logging.info(f"Found {len(nearby_cities)} cities nearby: {[x for _, _, x in nearby_cities]}")
 
@@ -60,5 +68,6 @@ def recommendations_pipeline(query, nlp, verbose=False):
 
     final_ranking = sorted(results, key=lambda x: -x['score'])
     logging.info(f"Final ranking: {[city['name'] for city in final_ranking]}")
+    logging.info(f"Final ranking length: {len(final_ranking)}")
 
     return final_ranking

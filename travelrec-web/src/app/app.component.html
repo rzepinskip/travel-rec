@@ -3,7 +3,8 @@
     <div class="col-12">
       <form>
         <div class="input-group mb-5">
-          <input type="text" class="form-control" placeholder="Type your query" aria-label="Type your query"
+          <input type="text" class="form-control" placeholder="Type your query e.g. mountains and swimming near Paris"
+            aria-label="Type your query" title="Currently handled climate terms: cold, mild, warm"
             aria-describedby="button-addon2" [(ngModel)]="query" name="queryInput">
           <div class="input-group-append">
             <button class="btn btn-primary" type="submit" id="button-addon2" (click)="search()"
@@ -64,7 +65,9 @@
             </tr>
             <tr *ngFor="let el of detailsList; let i=index">
               <td>{{ i + 1 }}</td>
-              <td>{{ el.name }} (<a href="https://www.google.pl/maps/place/{{ wktToGoogleMapsSearchString(el.coordinates) }}" target="_blank">map</a>)
+              <td>{{ el.name }} (<a
+                  href="https://www.google.pl/maps/place/{{ wktToGoogleMapsSearchString(el.coordinates) }}"
+                  target="_blank">map</a>)
               </td>
               <td>{{ el.distance | number : '1.2-2' }} km</td>
               <td>{{ el.score | number : '1.2-2' }}</td>
