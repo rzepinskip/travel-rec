@@ -12,7 +12,8 @@ def calculate_feature_score(max_distance: float, distance: float):
 def score_city(city, params):
     city_latitude, city_longitude, city_name = city
     geofeatures_codes, activities_codes, search_distances = params
-    geofeatures_count = 0
+    geofeatures_score = 0
+    geofeatures_places = []
     if len(geofeatures_codes) > 0:
         geo_results = get_geofeatures(
             city_latitude, city_longitude, search_distances['geofeatures'], geofeatures_codes
@@ -26,7 +27,8 @@ def score_city(city, params):
             } for gf in geofeatures_res]
         geofeatures_score = sum(place['score'] for place in geofeatures_places)
 
-    activities_count = 0
+    activities_score = 0
+    activities_places = []
     if len(activities_codes) > 0:
         activity_results = get_activities(
             city_latitude, city_longitude, search_distances['activities'], activities_codes
