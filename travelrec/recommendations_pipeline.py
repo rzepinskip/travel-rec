@@ -40,12 +40,12 @@ class NoNearbyCitiesWithTemperatureFoundError(Exception):
     def __str__(self):
         return NoNearbyCitiesWithTemperatureFoundError.message
 
-class NoNearbyCitiesWithClimateFoundError(Exception):
+class NoNearbyCitiesFoundError(Exception):
     """Raised when getting cities with specified climate results with empty list"""
     message = "Sorry, we didn't find any places meeting the climate conditions."
     
     def __str__(self):
-        return NoNearbyCitiesWithClimateFoundError.message
+        return NoNearbyCitiesFoundError.message
 
 def recommendations_pipeline(query, nlp, verbose=False):
     if verbose:
@@ -85,7 +85,7 @@ def recommendations_pipeline(query, nlp, verbose=False):
         if len(climate_predicates) == 0:
             raise NoNearbyCitiesWithTemperatureFoundError
         else:
-            raise NoNearbyCitiesWithClimateFoundError
+            raise NoNearbyCitiesFoundError
 
     # geofeatures ranking
     nouns = processed_statement.nouns()

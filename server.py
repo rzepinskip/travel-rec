@@ -6,7 +6,7 @@ from travelrec.recommendations_pipeline import (
     recommendations_pipeline,
     NoLocationsFoundError,
     MoreThanOneLocationFoundError,
-    NoNearbyCitiesWithClimateFoundError,
+    NoNearbyCitiesFoundError,
     NoNearbyCitiesWithTemperatureFoundError
 )
 
@@ -28,7 +28,7 @@ def api_recommendations(query):
         return json.dumps(str(e))
     except NoNearbyCitiesWithTemperatureFoundError as e:
         return json.dumps(str(e))
-    except NoNearbyCitiesWithClimateFoundError as e:
+    except NoNearbyCitiesFoundError as e:
         return json.dumps(str(e))
 
 @app.route('/app/<path:path>', methods=['GET'])
