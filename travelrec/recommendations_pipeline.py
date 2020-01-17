@@ -47,10 +47,12 @@ def recommendations_pipeline(query, nlp, verbose=False):
     # climate filters
     climate_predicates = climateSim.construct_filters(processed_statement.climate_terms())
     logging.info(f"Climate: {climate_predicates}")
-    loc = location_coordinates[0]
-    nearby_cities = get_cities_with_temperature(
-        loc[0], loc[1], search_distances['climate'], climate_predicates
-    )
+    nearby_cities = []
+    for loc in location_coordinates:
+        nearby_cities.extend(get_cities_with_temperature(
+            loc[0], loc[1], search_distances['climate'], climate_predicates
+        ))
+    nearby_cities = list(set(nearby_cities))
     logging.info(f"Found {len(nearby_cities)} cities nearby: {[x for _, _, x in nearby_cities]}")
 
     # geofeatures ranking
