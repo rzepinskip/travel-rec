@@ -3,7 +3,7 @@
     <div class="col-12">
       <form>
         <div class="input-group mb-5">
-          <input type="text" class="form-control" placeholder="Type your query e.g. mountains and swimming near Paris"
+          <input type="text" class="form-control" placeholder="Type your query e.g. mountains and swimming pools near Vienna"
             aria-label="Type your query" title="Currently handled climate terms: cold, mild, warm"
             aria-describedby="button-addon2" [(ngModel)]="query" name="queryInput">
           <div class="input-group-append">
@@ -17,7 +17,7 @@
     <div *ngIf="!errorMessage" class="col-12 results">
       <table class="table" *ngIf="recommendations.length > 0">
         <tr>
-          <th>lp</th>
+          <th>No.</th>
           <th>Name</th>
           <th>Score</th>
           <th>Details</th>
@@ -64,7 +64,7 @@
         <div class="col-12 results">
           <table class="table" *ngIf="detailsList.length > 0">
             <tr>
-              <th>lp</th>
+              <th>No.</th>
               <th>Name</th>
               <th>Distance</th>
               <th>Score</th>

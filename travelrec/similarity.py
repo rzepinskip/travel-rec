@@ -10,11 +10,14 @@ class BaseSimiliarity(ABC):
 
 
 class ClimatePredicate:
+    counter = 0
+
     def __init__(self, property_name, field_name, predicates):
+        ClimatePredicate.counter += 1
         self.property_name = property_name
-        self.field_name = field_name
+        self.field_name = field_name + "_" + str(ClimatePredicate.counter)
         self.predicate = " && ".join(
-            [f"{field_name} {predicate}" for predicate in predicates]
+            [f"{self.field_name} {predicate}" for predicate in predicates]
         )
 
     def __repr__(self):

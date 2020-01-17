@@ -21,15 +21,31 @@ search_distances = {
 
 class NoLocationsFoundError(Exception):
     """Raised when no locations were found based on provided query"""
-    pass
+    message = "Sorry, we didn't find any location in your query."
+
+    def __str__(self):
+        return NoLocationsFoundError.message
+
+class MoreThanOneLocationFoundError(Exception):
+    """Raised when more than one location were found based on provided query"""
+    message = "Please provide only one location in your query."
+    
+    def __str__(self):
+        return MoreThanOneLocationFoundError.message
 
 class NoNearbyCitiesWithTemperatureFoundError(Exception):
     """Raised when no cities with temperature were found"""
-    pass
+    message = "Sorry, we didn't find any places around."
+    
+    def __str__(self):
+        return NoNearbyCitiesWithTemperatureFoundError.message
 
 class NoNearbyCitiesWithClimateFoundError(Exception):
     """Raised when getting cities with specified climate results with empty list"""
-    pass
+    message = "Sorry, we didn't find any places meeting the climate conditions."
+    
+    def __str__(self):
+        return NoNearbyCitiesWithClimateFoundError.message
 
 def recommendations_pipeline(query, nlp, verbose=False):
     if verbose:
@@ -46,6 +62,8 @@ def recommendations_pipeline(query, nlp, verbose=False):
 
     if len(location_entities) == 0:
         raise NoLocationsFoundError
+    if len(location_entities) > 1:
+        raise MoreThanOneLocationFoundError
 
     location_coordinates = [get_location(loc.text) for loc in location_entities]
     logging.info("Coordinates:")

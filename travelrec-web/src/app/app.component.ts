@@ -20,12 +20,6 @@ export class AppComponent {
   modalName = '';
   query: string;
 
-  errors = {
-    1: "Sorry, we didn't find any location in your query.",
-    2: "Sorry, we didn't find any places around.",
-    3: "Sorry, we didn't find any places meeting the climate conditions.",
-  };
-
   constructor(
     private spinner: NgxSpinnerService,
     private http: HttpClient
@@ -38,7 +32,7 @@ export class AppComponent {
     if (this.query !== '') {
       this.http.get(environment.apiUrl + 'recommendations/' + this.query).subscribe((res: any[]) => {
         if (!Array.isArray(res)) {
-          this.errorMessage = this.errors[res];
+          this.errorMessage = res;
         } else {
           this.recommendations = res;
         }
