@@ -15,6 +15,7 @@ export class AppComponent {
   @ViewChild('lgModal') lgModal: any;
 
   recommendations = [];
+  errorMessage = null;
   detailsList = [];
   modalName = '';
   query: string;
@@ -26,9 +27,15 @@ export class AppComponent {
 
   search() {
     this.spinner.show();
+    this.recommendations = [];
+    this.errorMessage = null;
     if (this.query !== '') {
       this.http.get(environment.apiUrl + 'recommendations/' + this.query).subscribe((res: any[]) => {
-        this.recommendations = res;
+        if (!Array.isArray(res)) {
+          this.errorMessage = res;
+        } else {
+          this.recommendations = res;
+        }
       },
         () => { },
         () => this.spinner.hide());

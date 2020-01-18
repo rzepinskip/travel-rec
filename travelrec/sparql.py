@@ -7,7 +7,14 @@ def get_location(name):
     return loc.lat, loc.lng
 
 
-def get_cities_with_temperature(latitude, longitude, max_distance, predicate):
+def get_predicates_declarations(predicates):
+    predicates_str = [f"dbp:{predicate.property_name} {predicate.field_name}" for predicate in predicates]
+    return "; ".join(predicates_str)
+
+def get_predicates_filters(predicates):
+    return "(" + " || ".join([predicate.predicate for predicate in predicates]) + ")"
+
+def get_cities_with_temperature(latitude, longitude, max_distance, predicates):
     sparql = SPARQLWrapper("http://factforge.net/repositories/ff-news")
     query = f"""# Populated places with specified temperature
     PREFIX dbr: <http://dbpedia.org/resource/>
@@ -26,8 +33,8 @@ def get_cities_with_temperature(latitude, longitude, max_distance, predicate):
         rank:hasRDFRank3 ?rrank;
             geo-pos:lat ?lat;
             geo-pos:long ?long;
-            dbp:{predicate.property_name} {predicate.field_name} .
-        FILTER({predicate.predicate} 
+            {get_predicates_declarations(predicates)} .
+        FILTER({get_predicates_filters(predicates)} 
             && datatype(?lat) = xsd:float && datatype(?long) = xsd:float)
     }}
     ORDER BY DESC(?rrank)

@@ -2,7 +2,13 @@ from flask import Flask, send_from_directory
 from flask_cors import CORS
 import en_core_web_sm
 import json
-from travelrec.recommendations_pipeline import recommendations_pipeline
+from travelrec.recommendations_pipeline import (
+    recommendations_pipeline,
+    NoLocationsFoundError,
+    MoreThanOneLocationFoundError,
+    NoNearbyCitiesFoundError,
+    NoNearbyCitiesWithTemperatureFoundError
+)
 
 app = Flask(__name__)
 CORS(app)
@@ -13,8 +19,17 @@ debug = True
 
 @app.route('/api/recommendations/<query>')
 def api_recommendations(query):
-    recs = recommendations_pipeline(query, nlp, debug)
-    return json.dumps(recs)
+    try:
+        recs = recommendations_pipeline(query, nlp, debug)
+        return json.dumps(recs)
+    except NoLocationsFoundError as e:
+        return json.dumps(str(e))
+    except MoreThanOneLocationFoundError as e:
+        return json.dumps(str(e))
+    except NoNearbyCitiesWithTemperatureFoundError as e:
+        return json.dumps(str(e))
+    except NoNearbyCitiesFoundError as e:
+        return json.dumps(str(e))
 
 @app.route('/app/<path:path>', methods=['GET'])
 def app_path(path):
