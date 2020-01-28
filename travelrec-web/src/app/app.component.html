@@ -27,10 +27,10 @@
           <td>{{ rec.name }} (<a href="https://www.google.pl/maps/place/{{ rec.name }}" target="_blank">map</a>)</td>
           <td>{{ rec.score | number : '1.2-2' }}</td>
           <td class="smaller">
-            Found {{ rec.geofeatures_places.length }} suitable geofeatures
+            {{ rec.geofeatures_places.length }} suitable geofeatures found
             <a href="#" (click)="openDetailsList(rec.name + ' - geofeatures', rec.geofeatures_places)">Show</a>
             <br>
-            Found {{ rec.activities_places.length }} places suitable for indicated activities
+            {{ rec.activities_places.length }} places suitable for indicated activities found
             <a href="#" (click)="openDetailsList(rec.name + ' - activities', rec.activities_places)">Show</a>
             <br>
           </td>
