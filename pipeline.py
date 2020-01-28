@@ -6,9 +6,10 @@ nlp = en_core_web_sm.load()
 examples = [
     # "places for swimming near Paris",
     # "places near Paris with mountains for swimming",
-    "mountains near Rome",
+    # "mountains near Rome",
     # "mild places near Paris with mountains for swimming",
     # "cold or mild places near Dreux or Paris",
+    "mountains in Poland",
 ]
 
 for example in examples:

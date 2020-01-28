@@ -6,7 +6,8 @@ from travelrec.similarity import (
 )
 from travelrec.sparql import (
     get_location,
-    get_cities_with_temperature,
+    get_cities_with_temperature_near_point,
+    get_cities_with_temperature_in_country,
     get_geofeatures,
     get_activities,
 )
@@ -65,19 +66,24 @@ def recommendations_pipeline(query, nlp, verbose=False):
     if len(location_entities) > 1:
         raise MoreThanOneLocationFoundError
 
-    location_coordinates = [get_location(loc.text) for loc in location_entities]
+    geocoded_locations = [get_location(loc.text) for loc in location_entities]
     logging.info("Coordinates:")
-    for loc, coord in zip(location_entities, location_coordinates):
-        logging.info(f"\t{loc} - ({coord[0]}, {coord[1]})")
+    for loc, geocoded_loc in zip(location_entities, geocoded_locations):
+        logging.info(f"\t{loc} - ({geocoded_loc})")
 
     # climate filters
     climate_predicates = climateSim.construct_filters(processed_statement.climate_terms())
     logging.info(f"Climate: {climate_predicates}")
     nearby_cities = []
-    for coord in location_coordinates:
-        nearby_cities.extend(get_cities_with_temperature(
-            coord[0], coord[1], search_distances['climate'], climate_predicates
-        ))
+    for geocoded_loc in geocoded_locations:
+        if geocoded_loc[0] == 'COORD':
+            nearby_cities.extend(get_cities_with_temperature_near_point(
+                geocoded_loc[1], geocoded_loc[2], search_distances['climate'], climate_predicates
+            ))
+        elif geocoded_loc[0] == 'COUNTRY_CODE':
+            nearby_cities.extend(get_cities_with_temperature_in_country(
+                geocoded_loc[1], climate_predicates
+            ))
     nearby_cities = list(set(nearby_cities))
     logging.info(f"Found {len(nearby_cities)} cities nearby: {[x for _, _, x in nearby_cities]}")
 

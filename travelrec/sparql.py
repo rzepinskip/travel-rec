@@ -5,7 +5,11 @@ import geopy.distance
 
 def get_location(name):
     loc = geocoder.geonames(name, key="travelrec")
-    return loc.lat, loc.lng
+
+    if loc.code == 'PCLI':
+        return 'COUNTRY_CODE', loc.country_code
+    else:
+        return 'COORD', loc.lat, loc.lng
 
 
 def get_predicates_declarations(predicates):
@@ -15,7 +19,13 @@ def get_predicates_declarations(predicates):
 def get_predicates_filters(predicates):
     return "(" + " || ".join([predicate.predicate for predicate in predicates]) + ")"
 
-def get_cities_with_temperature(latitude, longitude, max_distance, predicates, limit = 35):
+def get_cities_with_temperature_near_point(latitude, longitude, max_distance, predicates, limit = 35):
+    return get_cities_with_temperature(f'gdb-geo:nearby({latitude} {longitude} "{max_distance}km")', predicates)
+
+def get_cities_with_temperature_in_country(country_code, predicates, limit = 35):
+    return get_cities_with_temperature(f'gn:countryCode "{country_code}"', predicates)
+
+def get_cities_with_temperature(search_query, predicates, limit = 35):
     sparql = SPARQLWrapper("http://factforge.net/repositories/ff-news")
     query = f"""# Populated places with specified temperature
     PREFIX dbr: <http://dbpedia.org/resource/>
@@ -29,14 +39,16 @@ def get_cities_with_temperature(latitude, longitude, max_distance, predicates, l
 
     SELECT DISTINCT ?object ?lat ?long
     WHERE {{
-    ?object gdb-geo:nearby({latitude} {longitude} "{max_distance}km");
+    ?object {search_query};
         gn:featureClass  gn:P;
         rank:hasRDFRank3 ?rrank;
             geo-pos:lat ?lat;
             geo-pos:long ?long;
             {get_predicates_declarations(predicates)} .
         FILTER({get_predicates_filters(predicates)} 
-            && datatype(?lat) = xsd:float && datatype(?long) = xsd:float)
+            && datatype(?lat) = xsd:float && datatype(?long) = xsd:float
+            && STRSTARTS(STR(?object), "http://dbpedia.org/resource")
+            )
     }}
     ORDER BY DESC(?rrank)
     LIMIT {limit}
