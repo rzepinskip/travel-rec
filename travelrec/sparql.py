@@ -1,5 +1,6 @@
 import geocoder
 from SPARQLWrapper import SPARQLWrapper, JSON
+import geopy.distance
 
 
 def get_location(name):
@@ -18,13 +19,13 @@ def get_predicates_declarations(predicates):
 def get_predicates_filters(predicates):
     return "(" + " || ".join([predicate.predicate for predicate in predicates]) + ")"
 
-def get_cities_with_temperature_near_point(latitude, longitude, max_distance, predicates):
+def get_cities_with_temperature_near_point(latitude, longitude, max_distance, predicates, limit = 35):
     return get_cities_with_temperature(f'gdb-geo:nearby({latitude} {longitude} "{max_distance}km")', predicates)
 
-def get_cities_with_temperature_in_country(country_code, predicates):
+def get_cities_with_temperature_in_country(country_code, predicates, limit = 35):
     return get_cities_with_temperature(f'gn:countryCode "{country_code}"', predicates)
 
-def get_cities_with_temperature(search_query, predicates):
+def get_cities_with_temperature(search_query, predicates, limit = 35):
     sparql = SPARQLWrapper("http://factforge.net/repositories/ff-news")
     query = f"""# Populated places with specified temperature
     PREFIX dbr: <http://dbpedia.org/resource/>
@@ -50,6 +51,7 @@ def get_cities_with_temperature(search_query, predicates):
             )
     }}
     ORDER BY DESC(?rrank)
+    LIMIT {limit}
     """
     sparql.setQuery(query)
     sparql.setReturnFormat(JSON)
@@ -58,17 +60,32 @@ def get_cities_with_temperature(search_query, predicates):
     entities = results["results"]["bindings"]
     cities = []
     for entity in entities:
-        cities.append(
-            (
-                entity["lat"]["value"],
-                entity["long"]["value"],
-                entity["object"]["value"].split("/")[-1],
+        entity_lat = entity["lat"]["value"]
+        entity_long = entity["long"]["value"]
+        entity_name = entity["object"]["value"].split("/")[-1].replace('_', ' ')
+
+        append_city = True
+
+        existing_cities = [c for c in cities if c[2] == entity_name]
+        if len(existing_cities) > 0:
+            new_city_pt = (entity_lat, entity_long)
+            for existing_city in existing_cities:
+                existing_city_pt = (existing_city[0], existing_city[1])
+                if geopy.distance.distance(new_city_pt, existing_city_pt).km < 10:
+                    append_city = False
+
+        if append_city:
+            cities.append(
+                (
+                    entity_lat,
+                    entity_long,
+                    entity_name,
+                )
             )
-        )
     return cities
 
 
-def get_geofeatures(latitude, longitude, max_distance, geo_features):
+def get_geofeatures(latitude, longitude, max_distance, geo_features, limit=500):
     sparql = SPARQLWrapper("http://factforge.net/repositories/ff-news")
     prefixed_geo_features = [f"gn:{x}" for x in geo_features]
     query = f"""
@@ -97,6 +114,7 @@ def get_geofeatures(latitude, longitude, max_distance, geo_features):
         FILTER(datatype(?lat) = xsd:float && datatype(?long) = xsd:float)
     }}
     ORDER BY ?distance_km
+    LIMIT {limit}
     """
     sparql.setQuery(query)
     sparql.setReturnFormat(JSON)
@@ -104,7 +122,7 @@ def get_geofeatures(latitude, longitude, max_distance, geo_features):
     return results
 
 
-def get_activities(latitude, longitude, max_distance, actitivies):
+def get_activities(latitude, longitude, max_distance, actitivies, limit=500):
     sparql = SPARQLWrapper(
         "http://geoknow-server.imis.athena-innovation.gr:11480/sparql"
     )
@@ -124,6 +142,7 @@ def get_activities(latitude, longitude, max_distance, actitivies):
             FILTER (?distance_km < {max_distance} && ?fCategory_Val IN ({", ".join(actitivies_quoted)}))
         }}
     ORDER BY ?distance_km
+    LIMIT {limit}
     """
     sparql.setQuery(query)
     sparql.setReturnFormat(JSON)

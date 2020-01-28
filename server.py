@@ -17,11 +17,13 @@ nlp = en_core_web_sm.load()
 
 debug = True
 
+LIMIT = 10
+
 @app.route('/api/recommendations/<query>')
 def api_recommendations(query):
     try:
         recs = recommendations_pipeline(query, nlp, debug)
-        return json.dumps(recs)
+        return json.dumps(recs[:LIMIT])
     except NoLocationsFoundError as e:
         return json.dumps(str(e))
     except MoreThanOneLocationFoundError as e:
